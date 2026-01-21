@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>simple_mml - Simple Eiffel Library</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <img src="images/logo.png" alt="simple_mml" class="logo">
+            <h1>simple_mml</h1>
+            <p class="tagline">Mathematical Model Library for Design by Contract specifications</p>
+            <div class="badges">
+                <img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="MIT License">
+                <img src="https://img.shields.io/badge/Eiffel-25.02-purple.svg" alt="Eiffel 25.02">
+                <img src="https://img.shields.io/badge/DBC-Contracts-green.svg" alt="Design by Contract">
+            </div>
+        </div>
+    </header>
+
+    <nav>
+        <div class="container">
+            <a href="#overview">Overview</a>
+            <a href="#quick-start">Quick Start</a>
+            <a href="#features">Features</a>
+            <a href="#api-reference">API Reference</a>
+            <a href="https://github.com/simple-eiffel/simple_mml">GitHub</a>
+        </div>
+    </nav>
+
+    <main>
+        <div class="container">
+            <section id="overview">
+                <h2>Overview</h2>
+                <p>simple_mml provides immutable mathematical model types for use in Design by Contract specifications. These classes allow you to express precise postconditions using mathematical concepts like sets, sequences, bags, maps, and relations.</p>
+                <p>Adapted from ETH Zurich's base2 library, simple_mml is fully void-safe and SCOOP-compatible. The library uses <code>[G -&gt; detachable ANY]</code> generic constraints to ensure compatibility with the model equality operator in void-safe mode.</p>
+                <p>The key insight is that model objects are transient—constructed within contract expressions from already-attached source data. They mirror safe structures for mathematical comparison, enabling postconditions like <code>model |=| old model &amp; x</code> that precisely specify state changes.</p>
+            </section>
+
+            <section id="quick-start">
+                <h2>Quick Start</h2>
+                <pre><code class="language-eiffel">class STACK [G -&gt; detachable ANY]
+feature
+    model: MML_SEQUENCE [G]
+        -- Mathematical model of stack contents.
+
+    push (x: G)
+            -- Push `x` onto stack.
+        do
+            -- implementation
+        ensure
+            model_extended: model |=| old model &amp; x
+        end
+
+    pop
+            -- Remove top element.
+        require
+            not_empty: not model.is_empty
+        do
+            -- implementation
+        ensure
+            model_reduced: model |=| old model.but_last
+        end
+end</code></pre>
+            </section>
+
+            <section id="features">
+                <h2>Features</h2>
+                <ul>
+                    <li>Model equality operator <code>|=|</code> for contract comparisons</li>
+                    <li>Immutable types—all modifications return new objects</li>
+                    <li>Full set/sequence/bag/map/relation operations</li>
+                    <li>1-indexed sequences (Eiffel convention)</li>
+                    <li>Design by Contract throughout</li>
+                    <li>Void-safe implementation</li>
+                    <li>SCOOP-compatible</li>
+                </ul>
+            </section>
+
+            <section id="api-reference">
+                <h2>API Reference</h2>
+
+                <h3>MML_MODEL</h3>
+                <p>Base class providing model equality comparison.</p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Feature</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>is_model_equal alias "|=|"</code></td>
+                            <td>Model equality comparison</td>
+                        </tr>
+                        <tr>
+                            <td><code>model_equals (v1, v2)</code></td>
+                            <td>Compare two values for model equality</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>MML_SET [G]</h3>
+                <p>Finite mathematical sets with unique unordered elements.</p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Feature</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>default_create</code></td>
+                            <td>Create empty set</td>
+                        </tr>
+                        <tr>
+                            <td><code>singleton (x)</code></td>
+                            <td>Create set containing only x</td>
+                        </tr>
+                        <tr>
+                            <td><code>has alias "[]" (x)</code></td>
+                            <td>Is x contained?</td>
+                        </tr>
+                        <tr>
+                            <td><code>count alias "#"</code></td>
+                            <td>Cardinality</td>
+                        </tr>
+                        <tr>
+                            <td><code>extended alias "&amp;" (x)</code></td>
+                            <td>Set with x added</td>
+                        </tr>
+                        <tr>
+                            <td><code>union alias "+" (other)</code></td>
+                            <td>Set union</td>
+                        </tr>
+                        <tr>
+                            <td><code>intersection alias "*" (other)</code></td>
+                            <td>Set intersection</td>
+                        </tr>
+                        <tr>
+                            <td><code>difference alias "-" (other)</code></td>
+                            <td>Set difference</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>MML_SEQUENCE [G]</h3>
+                <p>Finite mathematical sequences (ordered collections).</p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Feature</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>default_create</code></td>
+                            <td>Create empty sequence</td>
+                        </tr>
+                        <tr>
+                            <td><code>item alias "[]" (i)</code></td>
+                            <td>Value at position i</td>
+                        </tr>
+                        <tr>
+                            <td><code>count alias "#"</code></td>
+                            <td>Number of elements</td>
+                        </tr>
+                        <tr>
+                            <td><code>first, last</code></td>
+                            <td>First/last element</td>
+                        </tr>
+                        <tr>
+                            <td><code>extended alias "&amp;" (x)</code></td>
+                            <td>Sequence with x appended</td>
+                        </tr>
+                        <tr>
+                            <td><code>concatenation alias "+" (other)</code></td>
+                            <td>Concatenate sequences</td>
+                        </tr>
+                        <tr>
+                            <td><code>but_first, but_last</code></td>
+                            <td>Remove first/last element</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>MML_BAG [G]</h3>
+                <p>Finite mathematical bags (multisets with counted duplicates).</p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Feature</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>default_create</code></td>
+                            <td>Create empty bag</td>
+                        </tr>
+                        <tr>
+                            <td><code>occurrences alias "[]" (x)</code></td>
+                            <td>Count of x in bag</td>
+                        </tr>
+                        <tr>
+                            <td><code>count alias "#"</code></td>
+                            <td>Total element count</td>
+                        </tr>
+                        <tr>
+                            <td><code>extended alias "&amp;" (x)</code></td>
+                            <td>Bag with one more x</td>
+                        </tr>
+                        <tr>
+                            <td><code>union alias "+" (other)</code></td>
+                            <td>Bag union (sum counts)</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>MML_MAP [K, V]</h3>
+                <p>Finite mathematical maps (partial functions).</p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Feature</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>default_create</code></td>
+                            <td>Create empty map</td>
+                        </tr>
+                        <tr>
+                            <td><code>item alias "[]" (k)</code></td>
+                            <td>Value for key k</td>
+                        </tr>
+                        <tr>
+                            <td><code>domain</code></td>
+                            <td>Set of keys</td>
+                        </tr>
+                        <tr>
+                            <td><code>range</code></td>
+                            <td>Set of values</td>
+                        </tr>
+                        <tr>
+                            <td><code>updated (k, v)</code></td>
+                            <td>Map with k mapped to v</td>
+                        </tr>
+                        <tr>
+                            <td><code>override alias "+" (other)</code></td>
+                            <td>Override with other map</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>MML_RELATION [G, H]</h3>
+                <p>Finite mathematical relations (multi-valued keys).</p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Feature</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>default_create</code></td>
+                            <td>Create empty relation</td>
+                        </tr>
+                        <tr>
+                            <td><code>has alias "[]" (x, y)</code></td>
+                            <td>Is x related to y?</td>
+                        </tr>
+                        <tr>
+                            <td><code>domain</code></td>
+                            <td>Set of left components</td>
+                        </tr>
+                        <tr>
+                            <td><code>image_of (x)</code></td>
+                            <td>Set of values related to x</td>
+                        </tr>
+                        <tr>
+                            <td><code>inverse</code></td>
+                            <td>Inverted relation</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>MML_INTERVAL</h3>
+                <p>Integer ranges for sequence indexing.</p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Feature</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>from_range (l, u)</code></td>
+                            <td>Create interval [l, u]</td>
+                        </tr>
+                        <tr>
+                            <td><code>has alias "[]" (i)</code></td>
+                            <td>Is i in interval?</td>
+                        </tr>
+                        <tr>
+                            <td><code>lower, upper</code></td>
+                            <td>Bounds</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section id="installation">
+                <h2>Installation</h2>
+                <p>Add to your ECF file:</p>
+                <pre><code class="language-xml">&lt;library name="simple_mml" location="$SIMPLE_LIBS/simple_mml/simple_mml.ecf"/&gt;</code></pre>
+            </section>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 Simple Eiffel. <a href="https://github.com/simple-eiffel">GitHub</a></p>
+        </div>
+    </footer>
+</body>
+</html>
