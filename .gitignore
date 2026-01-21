@@ -1,0 +1,15 @@
+# Eiffel compilation output
+EIFGENs/
+
+# IDE files
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Backup files
+*.bak
+*.orig
