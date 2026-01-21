@@ -12,7 +12,7 @@ note
 	revision: "$Revision$"
 
 class
-	MML_SEQUENCE [G -> detachable ANY]
+	MML_SEQUENCE [G]
 
 inherit
 	MML_MODEL

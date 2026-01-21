@@ -11,7 +11,7 @@ note
 	revision: "$Revision$"
 
 class
-	MML_SET [G -> detachable ANY]
+	MML_SET [G]
 
 inherit
 	MML_MODEL

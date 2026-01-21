@@ -11,7 +11,7 @@ note
 	revision: "$Revision$"
 
 class
-	MML_RELATION [G -> detachable ANY, H -> detachable ANY]
+	MML_RELATION [G, H]
 
 inherit
 	MML_MODEL
