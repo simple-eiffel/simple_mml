@@ -5,6 +5,21 @@ All notable changes to simple_mml will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.1] - 2026-01-22
+
+### Changed
+- Generic constraints updated from `[G -> detachable ANY]` to `[G -> detachable separate ANY]`
+- `model_equals` signature updated to `(v1, v2: detachable separate ANY)`
+
+### Fixed
+- VUAR(2) type conformance errors when consumer libraries use simple_mml with SCOOP enabled
+- Consumer libraries like proven_fetch can now use MML types without compilation errors
+
+### Technical Notes
+- The `separate` keyword is required for SCOOP compatibility in consumer libraries
+- simple_mml compiles without these constraints, but consumers with `concurrency=scoop` would fail
+- This is a non-breaking change for consumers already using detachable types
+
 ## [1.0.0] - 2025-01-21
 
 ### Added
@@ -23,4 +38,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Technical Notes
 - Adapted from ETH Zurich's base2 library
-- Void safety requires `[G -> detachable ANY]` (not `[G -> ANY]`) for compatibility with `model_equals (v1, v2: detachable ANY)`
+- Void safety requires detachable constraint for compatibility with `model_equals`

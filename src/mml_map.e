@@ -11,7 +11,7 @@ note
 	revision: "$Revision$"
 
 class
-	MML_MAP [K, V]
+	MML_MAP [K -> detachable separate ANY, V -> detachable separate ANY]
 
 inherit
 	MML_MODEL

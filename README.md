@@ -29,7 +29,7 @@
 
 simple_mml provides immutable mathematical model types for use in Design by Contract specifications. These classes allow you to express precise postconditions using mathematical concepts like sets, sequences, bags, maps, and relations.
 
-Adapted from ETH Zurich's base2 library, simple_mml is fully void-safe and SCOOP-compatible. The library uses `[G -> detachable ANY]` generic constraints to ensure compatibility with the model equality operator in void-safe mode.
+Adapted from ETH Zurich's base2 library, simple_mml is fully void-safe and SCOOP-compatible. The library uses `[G -> detachable separate ANY]` generic constraints to ensure compatibility with the model equality operator in void-safe, SCOOP-enabled consumer libraries.
 
 The key insight is that model objects are transient—constructed within contract expressions from already-attached source data. They mirror safe structures for mathematical comparison, enabling postconditions like `model |=| old model & x` that precisely specify state changes.
 
@@ -182,17 +182,35 @@ export SIMPLE_LIBS=/path/to/simple/libraries
 |---------|---------|
 | base | ARRAYED_LIST for internal storage |
 
-## Technical Note: Void Safety
+## Technical Note: Void Safety and SCOOP Compatibility
 
-simple_mml uses `[G -> detachable ANY]` generic constraints. This is required because `model_equals` accepts `detachable ANY` parameters:
+simple_mml uses `[G -> detachable separate ANY]` generic constraints. This is required for two reasons:
+
+### 1. Void Safety (detachable)
+
+The `model_equals` function accepts `detachable separate ANY` parameters:
 
 ```eiffel
-frozen model_equals (v1, v2: detachable ANY): BOOLEAN
+frozen model_equals (v1, v2: detachable separate ANY): BOOLEAN
 ```
 
-Without this constraint, passing generic type `G` to `detachable ANY` triggers VUAR(2) errors in void-safe mode. The constraint `[G -> detachable ANY]` explicitly declares that G can be either attached or detachable, making it compatible with the comparison function.
+Without the `detachable` constraint, passing generic type `G` to `detachable ANY` triggers VUAR(2) errors in void-safe mode. The constraint explicitly declares that G can be either attached or detachable, making it compatible with the comparison function.
 
-Note: `[G -> ANY]` (attached) does NOT solve this—the constraint must match the detachability of the target parameter type.
+### 2. SCOOP Compatibility (separate)
+
+The `separate` keyword ensures consumer libraries using `concurrency=scoop` can use MML types without type conformance errors. When a library with `concurrency=scoop` uses simple_mml, all types must conform to the SCOOP model. The `separate` constraint allows MML types to hold references to potentially separate objects.
+
+### Why This Matters
+
+simple_mml compiles fine on its own without these constraints. However, **consumer libraries** using simple_mml with void-safety and SCOOP enabled will get VUAR(2) errors without them. The constraints exist for consumer compatibility, not for simple_mml's own compilation.
+
+```eiffel
+-- Consumer library example (works with constraints):
+class PROVEN_FETCH
+feature
+    headers_model: MML_MAP [STRING_32, STRING_32]
+        -- Works because STRING_32 conforms to detachable separate ANY
+```
 
 ## License
 

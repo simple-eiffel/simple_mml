@@ -27,7 +27,7 @@ feature -- Comparison
 			definition: Result = not is_model_equal (other)
 		end
 
-	frozen model_equals (v1, v2: detachable ANY): BOOLEAN
+	frozen model_equals (v1, v2: detachable separate ANY): BOOLEAN
 			-- Are `v1' and `v2' mathematically equal?
 			-- If they are models use model equality, otherwise object equality.
 		do
