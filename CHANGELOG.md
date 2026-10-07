@@ -5,6 +5,24 @@ All notable changes to simple_mml will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.2] - 2026-10-07
+
+### Fixed
+- **Finding distinct values is no longer quadratic.** `MML_SEQUENCE.range`, `MML_MAP.range` and
+  `MML_SET.no_duplicates` (the precondition of `make_from_list`, so every `range` checked it again)
+  compared every pair of values. With contract checking on, `ids_model.range.count` over 7,991 ids took
+  25 s, and held simple_prompter's start for 30 s. All three now use one routine,
+  `MML_MODEL.distinct_positions`: hashable values are bucketed by `hash_code` and compared (still with
+  `model_equals`) only within their bucket; models and non-hashable values keep the full comparison.
+  20,000 values: 31 ms (was over 11 s). No contract text changed.
+
+### Added
+- `MML_SEQUENCE.from_iterable`: build a sequence from any iterable in one step, copying the items. A
+  client could only build one with `&`, which copies the whole sequence per element (quadratic): 7,991
+  ids took seconds.
+- `MML_MODEL.distinct_positions`, and tests: distinct order and first occurrence, object equality on
+  `STRING`, models and non-hashable values, `MML_MAP.range`, and a speed check.
+
 ## [1.0.1] - 2026-01-22
 
 ### Changed

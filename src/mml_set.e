@@ -286,19 +286,8 @@ feature -- Implementation
 
 	no_duplicates (a_list: ARRAYED_LIST [G]): BOOLEAN
 			-- Are there no duplicate elements in `a_list'?
-		local
-			i, j: INTEGER
 		do
-			Result := True
-			from i := 1 until i > a_list.count or not Result loop
-				from j := i + 1 until j > a_list.count or not Result loop
-					if model_equals (a_list.i_th (i), a_list.i_th (j)) then
-						Result := False
-					end
-					j := j + 1
-				end
-				i := i + 1
-			end
+			Result := distinct_positions (a_list).count = a_list.count
 		end
 
 end

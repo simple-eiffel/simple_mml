@@ -39,6 +39,12 @@ feature {NONE} -- Test Runners
 		do
 			create lib_tests
 			run_test (agent lib_tests.test_sequence_empty, "test_sequence_empty")
+			run_test (agent lib_tests.test_sequence_range_distinct, "test_sequence_range_distinct")
+			run_test (agent lib_tests.test_sequence_range_object_equality, "test_sequence_range_object_equality")
+			run_test (agent lib_tests.test_sequence_range_models_and_unhashables, "test_sequence_range_models_and_unhashables")
+			run_test (agent lib_tests.test_map_range_distinct, "test_map_range_distinct")
+			run_test (agent lib_tests.test_range_is_fast, "test_range_is_fast")
+			run_test (agent lib_tests.test_sequence_from_iterable, "test_sequence_from_iterable")
 			run_test (agent lib_tests.test_sequence_singleton, "test_sequence_singleton")
 			run_test (agent lib_tests.test_sequence_extend, "test_sequence_extend")
 			run_test (agent lib_tests.test_sequence_front_tail, "test_sequence_front_tail")

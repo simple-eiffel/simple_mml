@@ -358,4 +358,113 @@ feature -- Relation Tests
 			assert ("image_not_3", not img [3])
 		end
 
+feature -- Range Tests (2026-10-07: hash-bucketed distinct)
+
+	test_sequence_range_distinct
+			-- Duplicates collapse, first occurrence and order kept.
+		local
+			seq: MML_SEQUENCE [INTEGER]
+			r: MML_SET [INTEGER]
+		do
+			create seq
+			seq := seq & 3 & 1 & 3 & 2 & 1 & 3
+			r := seq.range
+			assert ("three_distinct", r.count = 3)
+			assert ("has_all", r [1] and r [2] and r [3])
+		end
+
+	test_sequence_range_object_equality
+			-- Two different STRING objects with the same text are one value.
+		local
+			seq: MML_SEQUENCE [STRING]
+			a, b: STRING
+		do
+			a := "word"
+			b := "wo"
+			b.append ("rd")
+			create seq
+			seq := seq & a & b & "other"
+			assert ("not_same_object", a /= b)
+			assert ("two_values", seq.range.count = 2)
+		end
+
+	test_sequence_range_models_and_unhashables
+			-- Values that are models (model equality) or not hashable still collapse correctly.
+		local
+			seq: MML_SEQUENCE [MML_SET [INTEGER]]
+			s1, s2: MML_SET [INTEGER]
+			lists: MML_SEQUENCE [ARRAYED_LIST [INTEGER]]
+			l1, l2: ARRAYED_LIST [INTEGER]
+		do
+			create s1.singleton (5)
+			create s2.singleton (5)
+			create seq
+			seq := seq & s1 & s2
+			assert ("model_equal_sets_collapse", seq.range.count = 1)
+			create l1.make (1)
+			l1.extend (7)
+			create l2.make (1)
+			l2.extend (7)
+			create lists
+			lists := lists & l1 & l2
+			assert ("equal_lists_collapse", lists.range.count = 1)
+		end
+
+	test_map_range_distinct
+		local
+			m: MML_MAP [INTEGER, STRING]
+		do
+			create m
+			m := m.updated (1, "a").updated (2, "b").updated (3, "a")
+			assert ("two_values", m.range.count = 2)
+		end
+
+	test_range_is_fast
+			-- 20,000 values (10,000 distinct) in well under a second; the old pairwise scan took
+			-- 25 s for 7,991 distinct ids.
+		local
+			seq: MML_SEQUENCE [INTEGER]
+			i: INTEGER
+			t0: INTEGER_64
+			r: MML_SET [INTEGER]
+		do
+			create seq
+			from i := 1 until i > 20_000 loop
+				seq := seq & (i \\ 10_000)
+				i := i + 1
+			end
+			t0 := ms_now
+			r := seq.range
+			print ("    [range] 20,000 values -> " + r.count.out + " distinct in " + (ms_now - t0).out + " ms%N")
+			assert ("ten_thousand_distinct", r.count = 10_000)
+			assert ("under_one_second", ms_now - t0 < 1_000)
+		end
+
+	test_sequence_from_iterable
+			-- Built from a list in one step, in order, and independent of the list afterwards.
+		local
+			l: ARRAYED_LIST [INTEGER]
+			seq: MML_SEQUENCE [INTEGER]
+		do
+			create l.make (3)
+			l.extend (4)
+			l.extend (5)
+			l.extend (4)
+			create seq.from_iterable (l)
+			assert ("three", seq.count = 3)
+			assert ("in_order", seq [1] = 4 and seq [2] = 5 and seq [3] = 4)
+			l.extend (9)
+			assert ("independent", seq.count = 3)
+		end
+
+feature {NONE} -- Range test support
+
+	ms_now: INTEGER_64
+		external
+			"C inline use <windows.h>"
+		alias
+			"return (EIF_INTEGER_64) GetTickCount64 ();"
+		end
+
+
 end

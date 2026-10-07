@@ -139,25 +139,13 @@ feature -- Conversion
 	range: MML_SET [V]
 			-- Set of values.
 		local
-			new_storage: ARRAYED_LIST [V]
-			i, j: INTEGER
-			found: BOOLEAN
+			l_list: ARRAYED_LIST [V]
 		do
-			create new_storage.make (values.count)
-			from i := 1 until i > values.count loop
-				found := False
-				from j := 1 until j > new_storage.count or found loop
-					if model_equals (values.i_th (i), new_storage.i_th (j)) then
-						found := True
-					end
-					j := j + 1
-				end
-				if not found then
-					new_storage.extend (values.i_th (i))
-				end
-				i := i + 1
+			create l_list.make (values.count)
+			across distinct_positions (values) as ic loop
+				l_list.extend (values [ic])
 			end
-			create Result.make_from_list (new_storage)
+			create Result.make_from_list (l_list)
 		end
 
 	image (subdomain: MML_SET [K]): MML_SET [V]
