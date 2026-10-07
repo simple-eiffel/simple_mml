@@ -134,15 +134,13 @@ feature -- Conversion
 	range: MML_SET [G]
 			-- Set of values.
 		local
-			new_storage: ARRAYED_LIST [G]
+			l_list: ARRAYED_LIST [G]
 		do
-			create new_storage.make (storage.count)
-			across storage as ic loop
-				if not across new_storage as jc some model_equals (ic, jc) end then
-					new_storage.extend (ic)
-				end
+			create l_list.make (storage.count)
+			across distinct_positions (storage) as ic loop
+				l_list.extend (storage [ic])
 			end
-			create Result.make_from_list (new_storage)
+			create Result.make_from_list (l_list)
 		end
 
 	to_bag: MML_BAG [G]
