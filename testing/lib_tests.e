@@ -440,6 +440,23 @@ feature -- Range Tests (2026-10-07: hash-bucketed distinct)
 			assert ("under_one_second", ms_now - t0 < 1_000)
 		end
 
+	test_sequence_from_iterable
+			-- Built from a list in one step, in order, and independent of the list afterwards.
+		local
+			l: ARRAYED_LIST [INTEGER]
+			seq: MML_SEQUENCE [INTEGER]
+		do
+			create l.make (3)
+			l.extend (4)
+			l.extend (5)
+			l.extend (4)
+			create seq.from_iterable (l)
+			assert ("three", seq.count = 3)
+			assert ("in_order", seq [1] = 4 and seq [2] = 5 and seq [3] = 4)
+			l.extend (9)
+			assert ("independent", seq.count = 3)
+		end
+
 feature {NONE} -- Range test support
 
 	ms_now: INTEGER_64

@@ -17,6 +17,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   20,000 values: 31 ms (was over 11 s). No contract text changed.
 
 ### Added
+- `MML_SEQUENCE.from_iterable`: build a sequence from any iterable in one step, copying the items. A
+  client could only build one with `&`, which copies the whole sequence per element (quadratic): 7,991
+  ids took seconds.
 - `MML_MODEL.distinct_positions`, and tests: distinct order and first occurrence, object equality on
   `STRING`, models and non-hashable values, `MML_MAP.range`, and a speed check.
 

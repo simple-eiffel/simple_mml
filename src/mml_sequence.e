@@ -22,7 +22,8 @@ inherit
 
 create
 	default_create,
-	singleton
+	singleton,
+	from_iterable
 
 create {MML_MODEL}
 	make_from_list
@@ -45,6 +46,17 @@ feature {NONE} -- Initialization
 		ensure
 			one_element: count = 1
 			has_x: item (1) = x
+		end
+
+	from_iterable (a_items: ITERABLE [G])
+			-- Create the sequence of `a_items', in order. The items are copied into the
+			-- sequence's own storage, so later changes to `a_items' do not reach it. Building a
+			-- long sequence with `&' copies it once per element (quadratic); this does not.
+		do
+			create storage.make (16)
+			across a_items as ic loop
+				storage.extend (ic)
+			end
 		end
 
 feature -- Properties
