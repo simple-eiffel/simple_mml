@@ -90,6 +90,7 @@ feature {NONE} -- Test Runners
 			run_test (agent lib_tests.test_relation_empty, "test_relation_empty")
 			run_test (agent lib_tests.test_relation_multi_valued, "test_relation_multi_valued")
 			run_test (agent lib_tests.test_relation_image, "test_relation_image")
+			run_test (agent lib_tests.test_set_equality_expanded, "test_set_equality_expanded")
 		end
 
 feature {NONE} -- Implementation
