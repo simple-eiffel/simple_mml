@@ -19,7 +19,8 @@
 
 ## Status
 
-✅ **Production Ready** — v1.0.0
+✅ **Production Ready** — v1.0.3
+- Sets of expanded values (INTEGER, CHARACTER, ...) compare correctly in every system (fixed in 1.0.3; see CHANGELOG)
 - 7 classes
 - **83 tests total**
   - 57 internal (DBC contract assertions)
