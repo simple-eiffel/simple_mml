@@ -5,6 +5,18 @@ All notable changes to simple_mml will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.3] - 2026-11-03
+
+### Fixed
+- **Sets of expanded values (INTEGER, CHARACTER, ...) could compare unequal to themselves.**
+  - **Symptom:** in some systems, `{0} |=| {0}`, `{7} <= {7}` and `disjoint` gave wrong answers, and so did the `has_old` postcondition of `extended` (`&`). simple_eif_phone's touch model found it (`active_ids |=| (old active_ids & id)` failed). simple_mml's own suite never failed.
+  - **Cause:** `is_subset_of`, `disjoint` and `extended` called `has` through an agent (`for_all (agent other.has)`). In those systems the element reached `has` as a reference object (INTEGER_32_REF), and `model_equals` compared it with the stored INTEGER_32 by `~`, which requires identical types. The cause sits in compiled agent calls on an expanded actual generic, so it depends on the whole system, not on simple_mml's code.
+  - **Fix:** the three features (bodies and postconditions) loop directly (`across storage as ic all other.has (ic) end`), with no agents. Meaning is unchanged.
+  - **Effect on dependents:** sets of reference types (STRING, ...) behaved correctly before and still do. For expanded element types, the only change is that wrong False results become correct.
+
+### Added
+- Test `test_set_equality_expanded`.
+
 ## [1.0.2] - 2026-10-07
 
 ### Fixed

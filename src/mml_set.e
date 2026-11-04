@@ -110,10 +110,14 @@ feature -- Comparison
 
 	is_subset_of alias "<=" (other: MML_SET [G]): BOOLEAN
 			-- Does `other' have all elements of `Current'?
+			-- (Direct loop, not `for_all (agent other.has)': through that agent an
+			-- expanded element such as an INTEGER reaches `has' as a reference
+			-- object, `model_equals' then compares INTEGER_32_REF with INTEGER_32
+			-- by `~', and {0} <= {0} came out False. 1.0.3.)
 		do
-			Result := for_all (agent other.has)
+			Result := across storage as ic all other.has (ic) end
 		ensure
-			other_has_all: Result = for_all (agent other.has)
+			other_has_all: Result = across storage as ic all other.has (ic) end
 		end
 
 	is_superset_of alias ">=" (other: MML_SET [G]): BOOLEAN
@@ -127,9 +131,9 @@ feature -- Comparison
 	disjoint (other: MML_SET [G]): BOOLEAN
 			-- Do no elements of `other' occur in `Current'?
 		do
-			Result := not other.exists (agent has)
+			Result := not across other.storage as ic some has (ic) end
 		ensure
-			no_common_elements: Result = not other.exists (agent has)
+			no_common_elements: Result = not across other.storage as ic some has (ic) end
 		end
 
 feature -- Modification
@@ -151,7 +155,7 @@ feature -- Modification
 			end
 		ensure
 			has_x: Result.has (x)
-			has_old: for_all (agent Result.has)
+			has_old: across storage as ic all Result.has (ic) end
 		end
 
 	removed alias "/" (x: G): MML_SET [G]

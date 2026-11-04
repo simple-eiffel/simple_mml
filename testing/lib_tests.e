@@ -121,6 +121,22 @@ feature -- Set Tests
 			assert ("set_count", s.count = 1)
 		end
 
+	test_set_equality_expanded
+			-- Sets of an expanded type compare by value: {0} |=| {0}, {7} <= {7},
+			-- {0,3} |=| {3,0}. (Found by simple_eif_phone, 2026-11-03: through
+			-- `for_all (agent other.has)' these came out False in some systems.)
+		local
+			a, b: MML_SET [INTEGER]
+		do
+			create a.singleton (0)
+			create b.singleton (0)
+			assert ("singleton_equal", a |=| b)
+			assert ("subset", (create {MML_SET [INTEGER]}.singleton (7)) <= (create {MML_SET [INTEGER]}.singleton (7)))
+			assert ("order_free", (a & 3) |=| ((create {MML_SET [INTEGER]}.singleton (3)) & 0))
+			assert ("disjoint", a.disjoint (create {MML_SET [INTEGER]}.singleton (5)))
+			assert ("not_disjoint", not a.disjoint (b))
+		end
+
 	test_set_no_duplicates
 			-- Test that sets don't allow duplicates
 		local
