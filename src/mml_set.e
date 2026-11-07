@@ -21,7 +21,8 @@ inherit
 
 create
 	default_create,
-	singleton
+	singleton,
+	from_iterable
 
 create {MML_MODEL}
 	make_from_list
@@ -44,6 +45,23 @@ feature {NONE} -- Initialization
 		ensure
 			one_element: count = 1
 			has_x: has (x)
+		end
+
+	from_iterable (a_items: ITERABLE [G])
+			-- Create the set of the distinct values in `a_items'. Built in one pass: hashable
+			-- values are bucketed by `hash_code' (see `distinct_positions'). Building a long set
+			-- with `&' copies it once per element, which is quadratic.
+		local
+			l_all: ARRAYED_LIST [G]
+		do
+			create l_all.make (16)
+			across a_items as ic loop
+				l_all.extend (ic)
+			end
+			create storage.make (l_all.count)
+			across distinct_positions (l_all) as ic loop
+				storage.extend (l_all [ic])
+			end
 		end
 
 feature -- Properties

@@ -473,6 +473,45 @@ feature -- Range Tests (2026-10-07: hash-bucketed distinct)
 			assert ("independent", seq.count = 3)
 		end
 
+	test_set_from_iterable
+			-- Built from a list in one step: duplicates dropped, every value kept, and
+			-- independent of the list afterwards.
+		local
+			l: ARRAYED_LIST [INTEGER]
+			s: MML_SET [INTEGER]
+		do
+			create l.make (4)
+			l.extend (4)
+			l.extend (5)
+			l.extend (4)
+			l.extend (6)
+			create s.from_iterable (l)
+			assert ("three", s.count = 3)
+			assert ("all_kept", s.has (4) and s.has (5) and s.has (6))
+			l.extend (9)
+			assert ("independent", s.count = 3 and not s.has (9))
+		end
+
+	test_set_from_iterable_is_fast
+			-- 20,000 values with 10,000 distinct, in one pass: far under a second, where the
+			-- `&' loop it replaces copies the set 10,000 times.
+		local
+			l: ARRAYED_LIST [INTEGER]
+			s: MML_SET [INTEGER]
+			i: INTEGER
+			t0: INTEGER_64
+		do
+			create l.make (20_000)
+			from i := 1 until i > 20_000 loop
+				l.extend ((i - 1) \\ 10_000)
+				i := i + 1
+			end
+			t0 := ms_now
+			create s.from_iterable (l)
+			assert ("ten_thousand_distinct", s.count = 10_000)
+			assert ("under_one_second", ms_now - t0 < 1_000)
+		end
+
 feature {NONE} -- Range test support
 
 	ms_now: INTEGER_64
