@@ -439,16 +439,20 @@ feature -- Range Tests (2026-10-07: hash-bucketed distinct)
 			-- 20,000 values (10,000 distinct) in well under a second; the old pairwise scan took
 			-- 25 s for 7,991 distinct ids.
 		local
+			l: ARRAYED_LIST [INTEGER]
 			seq: MML_SEQUENCE [INTEGER]
 			i: INTEGER
 			t0: INTEGER_64
 			r: MML_SET [INTEGER]
 		do
-			create seq
+				-- Build the input in one pass: a `&' loop here copied the sequence 20,000
+				-- times and took most of a minute before the timed part even began.
+			create l.make (20_000)
 			from i := 1 until i > 20_000 loop
-				seq := seq & (i \\ 10_000)
+				l.extend (i \\ 10_000)
 				i := i + 1
 			end
+			create seq.from_iterable (l)
 			t0 := ms_now
 			r := seq.range
 			print ("    [range] 20,000 values -> " + r.count.out + " distinct in " + (ms_now - t0).out + " ms%N")
